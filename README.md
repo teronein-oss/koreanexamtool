@@ -1,4 +1,4 @@
-# koreanexamtool[korean-exam-seum-style_1.html](https://github.com/user-attachments/files/26456549/korean-exam-seum-style_1.html)
+[korean-exam-seum-style_1.html](https://github.com/user-attachments/files/26459692/korean-exam-seum-style_1.html)
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -6,139 +6,210 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seum Teachers Lab - 국어 문제 출제 도구</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-        .tab-button { transition: all 0.2s; }
-        .tab-button.active { background: white; border-bottom: 3px solid #3b82f6; font-weight: bold; }
-        .type-item { transition: all 0.2s; cursor: pointer; }
-        .type-item:hover { background: #f3f4f6; }
-        .type-item.selected { background: #fee2e2; border-left: 4px solid #ef4444; }
-        .dropdown-header { cursor: pointer; }
-        .dropdown-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
-        .dropdown-content.open { max-height: 1000px; }
-        .rotate-icon { transition: transform 0.3s; }
+        :root {
+            --ac: #E11D48;
+            --ac2: #BE123C;
+            --acs: #FFF1F2;
+        }
+        body { 
+            font-family: 'Noto Sans KR', sans-serif; 
+            background-color: #F8FAFC;
+        }
+        .title-font { font-family: 'Playfair Display', serif; }
+        .mono-font { font-family: 'IBM Plex Mono', monospace; }
+        
+        .tab-button { 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            color: #64748B;
+            position: relative;
+        }
+        .tab-button:hover { color: #0F172A; }
+        .tab-button.active { 
+            color: var(--ac); 
+            font-weight: 700; 
+        }
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--ac);
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .type-item { transition: all 0.2s ease; cursor: pointer; border: 1px solid transparent; }
+        .type-item:hover { background: var(--acs); border-color: #FECDD3; transform: translateY(-1px); }
+        .type-item.selected { 
+            background: var(--acs); 
+            border-color: #FDA4AF;
+            border-left: 4px solid var(--ac); 
+            box-shadow: 0 4px 6px -1px rgba(225, 29, 72, 0.1);
+        }
+        
+        .dropdown-header { cursor: pointer; user-select: none; }
+        .dropdown-content { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .dropdown-content.open { max-height: 1500px; }
+        .rotate-icon { transition: transform 0.3s ease; }
         .rotate-icon.open { transform: rotate(90deg); }
+        
+        .panel {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            border: 1px solid #F1F5F9;
+        }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+        /* Custom Dropdown */
+        .custom-select { position: relative; }
+        .custom-select-btn { 
+            width: 100%; text-align: left; background: #F8FAFC; border: 1px solid #E2E8F0; 
+            padding: 12px 16px; border-radius: 0.75rem; display: flex; justify-content: space-between; 
+            align-items: center; cursor: pointer; transition: all 0.2s; font-size: 0.875rem;
+        }
+        .custom-select-btn:hover { border-color: #CBD5E1; }
+        .custom-select-dropdown {
+            position: absolute; top: calc(100% + 4px); left: 0; width: 100%;
+            background: white; border: 1px solid #E2E8F0; border-radius: 0.75rem;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); z-index: 50;
+            max-height: 300px; overflow-y: auto; display: none;
+        }
+        .custom-select.open .custom-select-dropdown { display: block; }
+        .custom-select-category { font-size: 0.75rem; font-weight: 700; color: #94A3B8; padding: 12px 16px 4px; border-bottom: 1px solid #F1F5F9; margin-bottom: 4px; }
+        .custom-select-option { padding: 8px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; }
+        .custom-select-option:hover { background: #F8FAFC; }
     </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-slate-50 text-slate-800">
     <!-- Header -->
-    <div class="bg-gradient-to-r from-gray-900 to-gray-800 text-white px-6 py-4 shadow-lg">
+    <div class="bg-white border-b border-slate-200 px-6 py-4 shadow-sm sticky top-0 z-40">
         <div class="flex items-center justify-between max-w-7xl mx-auto">
             <div class="flex items-center gap-3">
-                <h1 class="text-2xl font-bold">Seum<span class="text-red-500">Teachers Lab</span></h1>
-                <span class="text-sm text-gray-400">국어 문제 출제 도구</span>
+                <h1 class="text-2xl font-bold title-font text-slate-900 tracking-tight">Seum<span class="text-rose-600">Teachers Lab</span></h1>
+                <span class="text-sm font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-full">국어 문제 출제 도구</span>
             </div>
-            <div class="flex items-center gap-4">
-                <select id="providerSelect" onchange="switchProvider()" class="bg-gray-700 text-white px-4 py-2 rounded border border-gray-600">
-                    <option value="claude">Claude API</option>
-                    <option value="gemini">Gemini API</option>
-                </select>
-                <select id="modelSelect" class="bg-gray-700 text-white px-4 py-2 rounded border border-gray-600">
-                    <option value="claude-sonnet-4-20250514">Claude Sonnet 4</option>
-                    <option value="claude-opus-4-20250514">Claude Opus 4</option>
-                </select>
-                <input type="password" id="apiKeyInput" placeholder="Claude API Key" 
-                    class="bg-gray-700 text-white px-4 py-2 rounded border border-gray-600 w-64">
-                <button onclick="saveApiKey()" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">저장</button>
-                <button onclick="showGuide()" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded">사용 가이드</button>
+            <div class="flex items-center gap-3">
+                <div class="flex items-center bg-slate-50 rounded-full border border-slate-200 p-1">
+                    <select id="providerSelect" onchange="switchProvider()" class="bg-transparent text-slate-700 px-3 py-1.5 focus:outline-none text-sm font-medium cursor-pointer">
+                        <option value="claude">Claude API</option>
+                        <option value="gemini">Gemini API</option>
+                    </select>
+                    <div class="w-px h-4 bg-slate-300 mx-1"></div>
+                    <select id="modelSelect" class="bg-transparent text-slate-700 px-3 py-1.5 focus:outline-none text-sm font-medium cursor-pointer">
+                        <option value="claude-sonnet-4-20250514">Claude Sonnet 4</option>
+                        <option value="claude-opus-4-20250514">Claude Opus 4</option>
+                    </select>
+                </div>
+                <input type="password" id="apiKeyInput" placeholder="API Key 입력..." 
+                    class="bg-white text-slate-800 px-4 py-2 rounded-full border border-slate-300 w-56 text-sm focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all">
+                <button onclick="saveApiKey()" class="bg-slate-800 hover:bg-slate-900 text-white px-5 py-2 rounded-full text-sm font-medium transition-colors shadow-sm">설정 저장</button>
+                <button onclick="showGuide()" class="bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 px-5 py-2 rounded-full text-sm font-medium transition-colors">가이드</button>
             </div>
         </div>
     </div>
 
     <!-- Tab Menu -->
-    <div class="bg-white border-b shadow-sm">
+    <div class="bg-white border-b border-slate-200 shadow-sm relative z-30">
         <div class="max-w-7xl mx-auto px-6">
-            <div class="flex gap-2">
-                <button class="tab-button px-6 py-4 active" onclick="switchTab('prompt')">
-                    ⚙️ 유형별 프롬프트 설정
+            <div class="flex gap-8">
+                <button class="tab-button px-2 py-5 active" onclick="switchTab('prompt')">
+                    <span class="mr-1">⚙️</span> 유형별 프롬프트 설정
                 </button>
-                <button class="tab-button px-6 py-4" onclick="switchTab('input')">
-                    📝 지문 입력
+                <button class="tab-button px-2 py-5" onclick="switchTab('input')">
+                    <span class="mr-1">📝</span> 지문 입력
                 </button>
-                <button class="tab-button px-6 py-4" onclick="switchTab('output')">
-                    📄 문항 출력
+                <button class="tab-button px-2 py-5" onclick="switchTab('output')">
+                    <span class="mr-1">📄</span> 문항 출력
                 </button>
             </div>
         </div>
     </div>
 
     <!-- Main Content -->
-    <div class="max-w-7xl mx-auto p-6">
-        <div class="flex gap-6">
+    <div class="max-w-7xl mx-auto p-6 md:py-8 layout-container">
+        <div class="flex flex-col md:flex-row gap-6 items-start">
             <!-- Left Sidebar -->
-            <div class="w-80 bg-white rounded-lg shadow-lg p-4">
-                <h3 class="font-bold text-gray-800 mb-4 pb-3 border-b">문제 유형 목록</h3>
-                <div id="typeList"></div>
+            <div class="w-full md:w-80 bg-white rounded-2xl panel p-5 shrink-0">
+                <h3 class="font-bold text-slate-800 mb-4 pb-3 border-b border-slate-100 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                    문제 유형 목록
+                </h3>
+                <div id="typeList" class="space-y-1"></div>
             </div>
 
             <!-- Main Panel -->
-            <div class="flex-1">
+            <div class="flex-1 w-full min-w-0">
                 <!-- Tab 1: 유형별 프롬프트 설정 -->
-                <div id="promptTab" class="tab-content bg-white rounded-lg shadow-lg p-6">
+                <div id="promptTab" class="tab-content bg-white rounded-2xl panel p-8">
                     <div id="promptEditor">
-                        <div class="text-center text-gray-500 py-20">
-                            <div class="text-6xl mb-4">⚙️</div>
-                            <h3 class="text-xl font-bold mb-2">유형을 선택하세요</h3>
-                            <p>왼쪽에서 문제 유형을 선택하면 프롬프트를 편집할 수 있습니다</p>
+                        <div class="text-center text-slate-400 py-24">
+                            <div class="text-6xl mb-6 opacity-30">⚙️</div>
+                            <h3 class="text-xl font-bold mb-2 text-slate-700">유형을 선택하세요</h3>
+                            <p class="text-sm">왼쪽에서 문제 유형을 선택하면<br>프롬프트를 편집할 수 있습니다</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Tab 2: 지문 입력 -->
-                <div id="inputTab" class="tab-content bg-white rounded-lg shadow-lg p-6 hidden">
-                    <h2 class="text-2xl font-bold mb-6 pb-4 border-b">지문 입력 및 출제</h2>
-                    
-                    <div class="mb-6">
-                        <label class="block font-bold text-gray-700 mb-2">지문 내용</label>
-                        <textarea id="passageInput" rows="15" 
-                            class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                            placeholder="출제할 지문을 입력하세요..."></textarea>
+                <div id="inputTab" class="tab-content bg-white rounded-2xl panel p-8 hidden">
+                    <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+                        <h2 class="text-2xl font-bold text-slate-800 title-font tracking-wide">지문 입력 및 출제</h2>
+                        <button onclick="addPassageBlock()" class="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 px-4 py-2 rounded-full text-sm font-bold transition-colors flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            지문 추가
+                        </button>
                     </div>
 
-                    <div class="mb-6">
-                        <label class="block font-bold text-gray-700 mb-3">출제할 유형 선택 (복수 선택 가능)</label>
-                        <div id="typeCheckboxes" class="grid grid-cols-2 gap-3"></div>
-                    </div>
-
-                    <div class="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                        <h4 class="font-bold text-yellow-800 mb-2">💡 추가 입력 필요</h4>
-                        <div id="additionalInputs"></div>
+                    <div id="passagesContainer" class="space-y-6 mb-8">
+                        <!-- Passage blocks will be added here dynamically -->
                     </div>
 
                     <button onclick="generateProblems()" 
-                        class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg text-lg shadow-lg">
+                        class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-4 rounded-xl text-lg shadow-[0_4px_14px_0_rgba(225,29,72,0.39)] hover:shadow-[0_6px_20px_rgba(225,29,72,0.23)] hover:-translate-y-0.5 transition-all duration-200">
                         🎯 선택한 유형으로 문제 생성하기
                     </button>
                 </div>
 
                 <!-- Tab 3: 문항 출력 -->
-                <div id="outputTab" class="tab-content bg-white rounded-lg shadow-lg p-6 hidden">
-                    <div class="flex items-center justify-between mb-6 pb-4 border-b">
-                        <h2 class="text-2xl font-bold">생성된 문제</h2>
+                <div id="outputTab" class="tab-content bg-white rounded-2xl panel p-8 hidden">
+                    <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+                        <h2 class="text-2xl font-bold text-slate-800 title-font tracking-wide">생성된 문제</h2>
                         <div class="flex gap-2">
-                            <button onclick="copyAllProblems()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-                                📋 전체 복사
+                            <button onclick="copyAllProblems()" class="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 px-4 py-2 rounded-full text-sm font-bold transition-colors">
+                                📋 텍스트 복사
                             </button>
-                            <button onclick="downloadAllProblems()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">
-                                💾 다운로드
+                            <button onclick="downloadAllProblems()" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 px-4 py-2 rounded-full text-sm font-bold transition-colors">
+                                💾 파일 다운로드
                             </button>
-                            <button onclick="clearProblems()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
-                                🗑️ 전체 삭제
+                            <button onclick="clearProblems()" class="bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 px-4 py-2 rounded-full text-sm font-bold transition-colors">
+                                <span class="text-rose-500 mr-1 opacity-70">✕</span> 전체 삭제
                             </button>
                         </div>
                     </div>
-                    <div id="problemsOutput"></div>
+                    <div id="problemsOutput" class="space-y-6"></div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg p-8 text-center">
-            <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <p class="text-gray-700 font-bold text-lg">문제 생성 중...</p>
-            <p class="text-gray-500 text-sm mt-2" id="loadingStatus">준비 중...</p>
+    <div id="loadingOverlay" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity">
+        <div class="bg-white rounded-2xl p-10 text-center shadow-2xl max-w-sm w-full mx-4 border border-white/20">
+            <div class="relative w-20 h-20 mx-auto mb-6">
+                <div class="absolute inset-0 border-4 border-rose-100 rounded-full"></div>
+                <div class="absolute inset-0 border-4 border-rose-600 rounded-full border-t-transparent animate-spin"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <span class="text-2xl">🤖</span>
+                </div>
+            </div>
+            <p class="text-slate-800 font-bold text-xl mb-2 title-font">문제 생성 중</p>
+            <p class="text-slate-500 text-sm bg-slate-50 py-2 px-4 rounded-lg inline-block border border-slate-100" id="loadingStatus">준비 중...</p>
         </div>
     </div>
 
@@ -860,12 +931,20 @@
         let selectedCategory = null;
         let selectedType = null;
         let generatedProblems = [];
+        let passageBlockCount = 0;
 
         // Initialize
         function init() {
             loadApiKey();
             renderTypeList();
-            renderTypeCheckboxes();
+            addPassageBlock(); // 기본 지문 블록 1개 추가
+
+            // 외부 클릭 시 드롭다운 닫기
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.custom-select')) {
+                    document.querySelectorAll('.custom-select').forEach(el => el.classList.remove('open'));
+                }
+            });
         }
 
         // API Key
@@ -898,9 +977,9 @@
                 if (saved) apiKeyInput.value = saved;
             } else {
                 modelSelect.innerHTML = `
-                    <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash (Experimental)</option>
-                    <option value="gemini-exp-1206">Gemini Exp 1206</option>
-                    <option value="gemini-2.0-flash-thinking-exp-1219">Gemini 2.0 Flash Thinking</option>
+                    <option value="gemini-3.1-pro">Gemini 3.1 Pro</option>
+                    <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                    <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
                 `;
                 apiKeyInput.placeholder = 'Gemini API Key (AIza...)';
                 const saved = localStorage.getItem('gemini_api_key_temp');
@@ -970,7 +1049,7 @@
                 
                 // Category Header
                 const header = document.createElement('div');
-                header.className = 'dropdown-header flex items-center justify-between p-3 bg-gray-100 rounded mb-2 hover:bg-gray-200';
+                header.className = 'dropdown-header flex items-center justify-between p-3 bg-slate-50 rounded-xl mb-2 hover:bg-slate-100 border border-slate-100';
                 header.onclick = () => toggleCategory(categoryKey);
                 header.innerHTML = `
                     <div class="flex items-center gap-2">
@@ -990,7 +1069,7 @@
                 Object.keys(category.types).forEach(typeKey => {
                     const type = category.types[typeKey];
                     const item = document.createElement('div');
-                    item.className = 'type-item p-2 pl-4 mb-1 rounded';
+                    item.className = 'type-item p-3 pl-4 mb-1 rounded-lg';
                     item.id = `type_${categoryKey}_${typeKey}`;
                     item.onclick = (e) => {
                         e.stopPropagation();
@@ -999,7 +1078,6 @@
                     item.innerHTML = `
                         <div class="flex justify-between items-center">
                             <span class="text-sm font-medium">${type.name}</span>
-                            <span class="text-xs px-2 py-0.5 bg-gray-200 rounded">${type.points}</span>
                         </div>
                         <div class="text-xs text-gray-500 mt-1">${type.code}</div>
                     `;
@@ -1041,9 +1119,9 @@
                     <div class="flex items-center justify-between mb-4 pb-3 border-b">
                         <div>
                             <h2 class="text-2xl font-bold text-gray-800">${type.name}</h2>
-                            <p class="text-sm text-gray-500 mt-1">코드: ${type.code} | 배점: ${type.points}</p>
+                            <p class="text-sm text-gray-500 mt-1">코드: ${type.code}</p>
                         </div>
-                        <button onclick="resetPrompt()" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded">
+                        <button onclick="resetPrompt()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full text-sm font-medium transition-colors">
                             🔄 기본값 복원
                         </button>
                     </div>
@@ -1052,22 +1130,22 @@
                 <div class="mb-4">
                     <label class="block font-bold text-gray-700 mb-2">필수 입력 항목</label>
                     <div class="flex gap-2">
-                        ${type.inputs.map(inp => `<span class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-sm">${inp}</span>`).join('')}
+                        ${type.inputs.map(inp => `<span class="px-3 py-1 bg-rose-50 text-rose-700 border border-rose-100 rounded-md text-sm">${inp}</span>`).join('')}
                     </div>
                 </div>
 
                 <div class="mb-4">
                     <label class="block font-bold text-gray-700 mb-2">메타프롬프트 (AI 출제 지시사항)</label>
                     <textarea id="promptTextarea" rows="20" 
-                        class="w-full px-4 py-3 border rounded-lg font-mono text-sm">${type.prompt}</textarea>
+                        class="w-full px-5 py-4 border border-slate-200 rounded-xl mono-font text-sm focus:ring-4 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all leading-relaxed bg-slate-50 focus:bg-white">${type.prompt}</textarea>
                 </div>
 
                 <div class="flex gap-3">
-                    <button onclick="savePrompt()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold">
+                    <button onclick="savePrompt()" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white py-3 rounded-xl font-bold shadow-sm transition-colors">
                         💾 프롬프트 저장
                     </button>
-                    <button onclick="testPrompt()" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold">
-                        🧪 테스트 출제
+                    <button onclick="testPrompt()" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-3 rounded-xl font-bold shadow-sm transition-colors">
+                        🧪 이동하여 출제
                     </button>
                 </div>
             `;
@@ -1097,69 +1175,152 @@
             switchTab('input');
         }
 
-        // Render Type Checkboxes
-        function renderTypeCheckboxes() {
-            const container = document.getElementById('typeCheckboxes');
-            container.innerHTML = '';
-
+        function addPassageBlock() {
+            passageBlockCount++;
+            const blockId = `passage_block_${passageBlockCount}`;
+            
+            const container = document.getElementById('passagesContainer');
+            const block = document.createElement('div');
+            block.id = blockId;
+            block.className = 'passage-block bg-white p-6 rounded-xl border border-slate-200 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] relative';
+            
+            let dropdownOptions = '';
             Object.keys(examTypes).forEach(categoryKey => {
                 const category = examTypes[categoryKey];
+                dropdownOptions += `<div class="custom-select-category">${category.icon} ${category.name}</div>`;
                 
                 Object.keys(category.types).forEach(typeKey => {
                     const type = category.types[typeKey];
-                    const div = document.createElement('div');
-                    div.className = 'flex items-center gap-2 p-3 bg-gray-50 rounded border';
-                    div.innerHTML = `
-                        <input type="checkbox" id="check_${categoryKey}_${typeKey}" 
-                            value="${categoryKey}:${typeKey}" 
-                            class="type-checkbox w-4 h-4"
-                            onchange="updateAdditionalInputs()">
-                        <label for="check_${categoryKey}_${typeKey}" class="text-sm flex-1">
-                            <span class="font-bold">${type.name}</span>
-                            <span class="text-gray-500 text-xs ml-2">${type.points}</span>
+                    const cbId = `check_${blockId}_${categoryKey}_${typeKey}`;
+                    dropdownOptions += `
+                        <label class="custom-select-option" for="${cbId}" onclick="event.stopPropagation()">
+                            <input type="checkbox" id="${cbId}" value="${categoryKey}:${typeKey}" 
+                                class="type-checkbox-${blockId} w-4 h-4 accent-rose-500 rounded cursor-pointer"
+                                onchange="updateBlockAdditionalInputs('${blockId}')">
+                            <div class="flex-1">
+                                <span class="font-medium text-slate-800 text-sm">${type.name}</span>
+                            </div>
                         </label>
                     `;
-                    container.appendChild(div);
                 });
             });
+
+            block.innerHTML = `
+                ${passageBlockCount > 1 ? `<button onclick="removePassageBlock('${blockId}')" class="absolute top-4 right-4 text-slate-400 hover:text-rose-500 transition-colors p-2 text-sm font-bold flex items-center gap-1"><span class="text-lg leading-none">&times;</span> 지문 삭제</button>` : ''}
+                <h3 class="font-bold text-slate-800 mb-4 text-lg title-font flex items-center gap-2">
+                    <span class="bg-rose-100 text-rose-600 px-2 py-0.5 rounded text-sm">지문 ${passageBlockCount}</span>
+                </h3>
+
+                <div class="mb-5">
+                    <label class="block font-semibold text-slate-700 mb-2 text-sm">지문 내용</label>
+                    <textarea id="passageInput_${blockId}" rows="8" 
+                        class="passage-textarea w-full px-5 py-4 border border-slate-200 rounded-xl focus:ring-4 focus:ring-rose-500/20 focus:border-rose-500 transition-all outline-none bg-slate-50 focus:bg-white text-base leading-relaxed mono-font"
+                        placeholder="출제할 지문을 입력하세요..."></textarea>
+                </div>
+
+                <div class="mb-5">
+                    <label class="block font-semibold text-slate-700 mb-2 text-sm">출제할 유형 선택 (복수 선택 가능)</label>
+                    <div class="custom-select" id="dropdown_${blockId}">
+                        <div class="custom-select-btn" onclick="toggleDropdown('${blockId}', event)">
+                            <span id="dropdown_text_${blockId}">분석할 문제 유형을 선택하세요</span>
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div class="custom-select-dropdown">
+                            ${dropdownOptions}
+                        </div>
+                    </div>
+                    <div id="selected_tags_${blockId}" class="flex flex-wrap gap-2 mt-3"></div>
+                </div>
+
+                <div id="additionalInputs_${blockId}" class="space-y-3 hidden bg-rose-50/50 border border-rose-100 rounded-xl p-5 shadow-sm mt-4">
+                </div>
+            `;
+            container.appendChild(block);
         }
 
-        // Update Additional Inputs
-        function updateAdditionalInputs() {
-            const container = document.getElementById('additionalInputs');
-            const checked = Array.from(document.querySelectorAll('.type-checkbox:checked'));
+        function removePassageBlock(blockId) {
+            const block = document.getElementById(blockId);
+            if (block) {
+                block.remove();
+            }
+        }
+
+        function toggleDropdown(blockId, event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById(`dropdown_${blockId}`);
+            const wasOpen = dropdown.classList.contains('open');
+            document.querySelectorAll('.custom-select').forEach(el => el.classList.remove('open'));
+            if (!wasOpen) {
+                dropdown.classList.add('open');
+            }
+        }
+
+        function uncheckType(blockId, checkboxId) {
+            const cb = document.getElementById(checkboxId);
+            if (cb) {
+                cb.checked = false;
+                updateBlockAdditionalInputs(blockId);
+            }
+        }
+
+        function updateBlockAdditionalInputs(blockId) {
+            const container = document.getElementById(`additionalInputs_${blockId}`);
+            const btnText = document.getElementById(`dropdown_text_${blockId}`);
+            const tagsContainer = document.getElementById(`selected_tags_${blockId}`);
+            const checked = Array.from(document.querySelectorAll(`.type-checkbox-${blockId}:checked`));
             
             if (checked.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 text-sm">선택한 유형이 없습니다</p>';
+                btnText.textContent = "분석할 문제 유형을 선택하세요";
+                tagsContainer.innerHTML = '';
+                container.classList.add('hidden');
+                container.innerHTML = '';
                 return;
             }
 
+            btnText.textContent = `${checked.length}개의 유형 선택됨`;
+
+            let tagsHtml = '';
             const additionalInputsNeeded = new Set();
             checked.forEach(cb => {
                 const [cat, typ] = cb.value.split(':');
                 const type = examTypes[cat].types[typ];
+                
+                tagsHtml += `<span class="inline-flex items-center gap-1 px-3 py-1 bg-rose-50 border border-rose-200 text-rose-700 rounded-full text-sm font-medium">
+                    ${type.name}
+                    <button type="button" onclick="uncheckType('${blockId}', '${cb.id}')" class="hover:bg-rose-200 hover:text-rose-900 text-rose-400 rounded-full p-0.5 transition-colors"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                </span>`;
+
                 type.inputs.forEach(inp => {
                     if (inp !== '지문') additionalInputsNeeded.add(inp);
                 });
             });
+            tagsContainer.innerHTML = tagsHtml;
 
             if (additionalInputsNeeded.size === 0) {
-                container.innerHTML = '<p class="text-green-600 text-sm">✅ 지문만 입력하면 됩니다</p>';
+                container.classList.add('hidden');
+                container.innerHTML = '';
                 return;
             }
 
-            container.innerHTML = '';
+            container.classList.remove('hidden');
+            let html = `
+                <h4 class="font-bold text-rose-800 mb-3 text-sm flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    추가 입력 필요
+                </h4>
+            `;
+            
             additionalInputsNeeded.forEach(input => {
-                const div = document.createElement('div');
-                div.className = 'mb-3';
-                div.innerHTML = `
-                    <label class="block font-medium text-gray-700 mb-1 text-sm">${input}</label>
-                    <textarea id="additional_${input.replace(/\s+/g, '_')}" rows="4" 
-                        class="w-full px-3 py-2 border rounded text-sm"
-                        placeholder="${input}을(를) 입력하세요..."></textarea>
+                html += `
+                    <div class="mb-3">
+                        <label class="block font-medium text-slate-700 mb-1 text-sm">${input}</label>
+                        <textarea id="additional_${blockId}_${input.replace(/\s+/g, '_')}" rows="3" 
+                            class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:ring-4 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all bg-slate-50 focus:bg-white"
+                            placeholder="${input}을(를) 입력하세요..."></textarea>
+                    </div>
                 `;
-                container.appendChild(div);
             });
+            container.innerHTML = html;
         }
 
         // Generate Problems
@@ -1174,67 +1335,88 @@
                 return;
             }
 
-            const passage = document.getElementById('passageInput').value.trim();
-            if (!passage) {
-                alert('❌ 지문을 입력하세요.');
+            const passageBlocks = document.querySelectorAll('.passage-block');
+            if (passageBlocks.length === 0) {
+                alert('❌ 지문이 없습니다.');
                 return;
             }
 
-            const checked = Array.from(document.querySelectorAll('.type-checkbox:checked'));
-            if (checked.length === 0) {
+            // Collect all generation tasks
+            const tasks = [];
+            let totalChecked = 0;
+
+            for (let i = 0; i < passageBlocks.length; i++) {
+                const block = passageBlocks[i];
+                const blockId = block.id;
+                const passage = document.getElementById(`passageInput_${blockId}`).value.trim();
+                
+                const checked = Array.from(document.querySelectorAll(`.type-checkbox-${blockId}:checked`));
+                if (checked.length > 0 && !passage) {
+                    alert(`❌ 지문 ${i + 1}의 내용을 입력하세요.`);
+                    return;
+                }
+
+                totalChecked += checked.length;
+
+                checked.forEach(cb => {
+                    const [cat, typ] = cb.value.split(':');
+                    const type = examTypes[cat].types[typ];
+                    
+                    const inputs = { '지문': passage };
+                    type.inputs.forEach(inp => {
+                        if (inp !== '지문') {
+                            const id = `additional_${blockId}_${inp.replace(/\s+/g, '_')}`;
+                            const elem = document.getElementById(id);
+                            if (elem) inputs[inp] = elem.value.trim();
+                        }
+                    });
+
+                    let prompt = type.prompt;
+                    Object.keys(inputs).forEach(key => {
+                        prompt = prompt.replace(`{${key}}`, inputs[key] || '');
+                    });
+
+                    tasks.push({
+                        type: type,
+                        prompt: prompt,
+                        blockNumber: i + 1
+                    });
+                });
+            }
+
+            if (tasks.length === 0) {
                 alert('❌ 출제할 유형을 하나 이상 선택하세요.');
                 return;
             }
 
             // Show loading
             document.getElementById('loadingOverlay').classList.remove('hidden');
-            
             const problems = [];
             
-            for (let i = 0; i < checked.length; i++) {
-                const cb = checked[i];
-                const [cat, typ] = cb.value.split(':');
-                const type = examTypes[cat].types[typ];
-                
+            for (let i = 0; i < tasks.length; i++) {
+                const task = tasks[i];
                 document.getElementById('loadingStatus').textContent = 
-                    `${i + 1}/${checked.length} - ${type.name} 생성 중...`;
+                    `${i + 1}/${tasks.length} - [지문 ${task.blockNumber}] ${task.type.name} 생성 중...`;
 
                 try {
-                    // Prepare inputs
-                    const inputs = { '지문': passage };
-                    type.inputs.forEach(inp => {
-                        if (inp !== '지문') {
-                            const id = `additional_${inp.replace(/\s+/g, '_')}`;
-                            const elem = document.getElementById(id);
-                            if (elem) inputs[inp] = elem.value.trim();
-                        }
-                    });
-
-                    // Build prompt
-                    let prompt = type.prompt;
-                    Object.keys(inputs).forEach(key => {
-                        prompt = prompt.replace(`{${key}}`, inputs[key] || '');
-                    });
-
-                    // Call API based on provider
                     let problemText;
                     if (provider === 'claude') {
-                        problemText = await callClaudeAPI(apiKey, prompt);
+                        problemText = await callClaudeAPI(apiKey, task.prompt);
                     } else {
-                        problemText = await callGeminiAPI(apiKey, prompt);
+                        problemText = await callGeminiAPI(apiKey, task.prompt);
                     }
 
                     problems.push({
-                        type: type.name,
-                        points: type.points,
+                        type: `[지문 ${task.blockNumber}] ` + task.type.name,
+                        points: task.type.points,
                         content: problemText,
                         timestamp: new Date().toISOString()
                     });
 
                 } catch (error) {
                     problems.push({
-                        type: type.name,
-                        points: type.points,
+                        type: `[지문 ${task.blockNumber}] ` + task.type.name,
+                        points: task.type.points,
                         content: `❌ 오류 발생: ${error.message}`,
                         timestamp: new Date().toISOString()
                     });
@@ -1315,23 +1497,23 @@
             
             if (generatedProblems.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center text-gray-500 py-20">
-                        <div class="text-6xl mb-4">📝</div>
-                        <h3 class="text-xl font-bold mb-2">생성된 문제가 없습니다</h3>
-                        <p>"지문 입력" 탭에서 문제를 생성하세요</p>
+                    <div class="text-center text-slate-400 py-24">
+                        <div class="text-6xl mb-6 opacity-30">📝</div>
+                        <h3 class="text-xl font-bold mb-2 text-slate-700 title-font">생성된 문제가 없습니다</h3>
+                        <p class="text-sm">"지문 입력" 탭에서 문제를 생성하세요</p>
                     </div>
                 `;
                 return;
             }
 
             container.innerHTML = generatedProblems.map((prob, idx) => `
-                <div class="mb-6 bg-gray-50 rounded-lg p-6 border-l-4 border-blue-500">
+                <div class="mb-6 bg-white rounded-2xl p-6 border border-slate-100 shadow-sm border-l-4 border-l-rose-500">
                     <div class="flex items-center justify-between mb-4">
                         <div>
-                            <h3 class="font-bold text-lg">${idx + 1}. ${prob.type}</h3>
-                            <p class="text-sm text-gray-500">${prob.points} | ${new Date(prob.timestamp).toLocaleString('ko-KR')}</p>
+                            <h3 class="font-bold text-lg text-slate-800 title-font">${idx + 1}. ${prob.type}</h3>
+                            <p class="text-sm text-slate-500 font-medium">${new Date(prob.timestamp).toLocaleString('ko-KR')}</p>
                         </div>
-                        <button onclick="copyProblem(${idx})" class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm">
+                        <button onclick="copyProblem(${idx})" class="px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 transition-colors rounded-full text-sm font-bold">
                             📋 복사
                         </button>
                     </div>
@@ -1342,7 +1524,7 @@
 
         function copyProblem(idx) {
             const prob = generatedProblems[idx];
-            const text = `${prob.type} (${prob.points})\n\n${prob.content}`;
+            const text = `${prob.type}\n\n${prob.content}`;
             navigator.clipboard.writeText(text).then(() => {
                 alert('✅ 클립보드에 복사되었습니다!');
             });
@@ -1350,7 +1532,7 @@
 
         function copyAllProblems() {
             const text = generatedProblems.map((prob, idx) => 
-                `[${idx + 1}] ${prob.type} (${prob.points})\n\n${prob.content}\n\n${'='.repeat(80)}\n`
+                `[${idx + 1}] ${prob.type}\n\n${prob.content}\n\n${'='.repeat(80)}\n`
             ).join('\n');
             navigator.clipboard.writeText(text).then(() => {
                 alert('✅ 전체 문제가 클립보드에 복사되었습니다!');
@@ -1359,7 +1541,7 @@
 
         function downloadAllProblems() {
             const text = generatedProblems.map((prob, idx) => 
-                `[${idx + 1}] ${prob.type} (${prob.points})\n생성 시각: ${new Date(prob.timestamp).toLocaleString('ko-KR')}\n\n${prob.content}\n\n${'='.repeat(80)}\n`
+                `[${idx + 1}] ${prob.type}\n생성 시각: ${new Date(prob.timestamp).toLocaleString('ko-KR')}\n\n${prob.content}\n\n${'='.repeat(80)}\n`
             ).join('\n');
             
             const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
